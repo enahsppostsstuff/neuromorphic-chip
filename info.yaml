@@ -1,56 +1,65 @@
-# Tiny Tapeout project information
+# Tiny Tapeout Project Information Manifest
+# See https://tinytapeout.com for more information
+
 project:
-  title:        ""      # Project title
-  author:       ""      # Your name
-  discord:      ""      # Your discord username, for communication and automatically assigning you a Tapeout role (optional)
-  description:  ""      # One line description of what your project does
-  language:     "Verilog" # other examples include SystemVerilog, Amaranth, VHDL, etc
-  clock_hz:     0       # Clock frequency in Hz (or 0 if not applicable)
+  title:        "Max-Spec 8x8 Event-Driven Spiking Neural Processor"
+  description:  "An event-driven spiking neural processor maximizing a 1x1 tile with 8 pre-synaptic inputs, 8 LIF neurons, and 64 3-bit signed weights."
+  author:       "Your Name"
+  language:     "SystemVerilog"
+  clock_hz:     50000000       # Target clock speed: 50 MHz
 
-  # How many tiles your design occupies? A single tile is about 167x108 uM.
-  tiles: "1x1"          # Valid values: 1x1, 1x2, 2x2, 3x2, 4x2, 6x2 or 8x2
+  # How many tiles do you want your design to use? Maxed out to fit safely within a standard 1x1 configuration footprint.
+  tiles: "1x1"
 
-  # Your top module name must start with "tt_um_". Make it unique by including your github username:
-  top_module:  "tt_um_example"
+  # Your top module name must match this field precisely
+  top_module: "tt_um_neural_processor"
 
-  # List your project's source files here.
-  # Source files must be in ./src and you must list each source file separately, one per line.
-  # Don't forget to also update `PROJECT_SOURCES` in test/Makefile.
+  # List your source files inside the /src directory
   source_files:
-    - "project.v"
+    - "tt_um_neural_processor.v"
 
-# The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.
-# This section is for the datasheet/website. Use descriptive names (e.g., RX, TX, MOSI, SCL, SEG_A, etc.).
+# Pinout mapping matching the Icarus-verified SystemVerilog top-level wrapper interface configuration
 pinout:
-  # Inputs
-  ui[0]: ""
-  ui[1]: ""
-  ui[2]: ""
-  ui[3]: ""
-  ui[4]: ""
-  ui[5]: ""
-  ui[6]: ""
-  ui[7]: ""
+  # Dedicated input pins (ui_in)
+  ui:
+    - "input_spike_valid / cfg_write_en"  # ui_in[0]: Shared spike evaluation trigger and configuration write gate
+    - "input_neuron_id[0]"                 # ui_in[1]: 3-bit pre-synaptic input source pointer (bit 0)
+    - "input_neuron_id[1]"                 # ui_in[2]: 3-bit pre-synaptic input source pointer (bit 1)
+    - "input_neuron_id[2]"                 # ui_in[3]: 3-bit pre-synaptic input source pointer (bit 2)
+    - "Unused"                             # ui_in[4]: Unused pin (Tied Low)
+    - "cfg_weight_data[0]"                 # ui_in[5]: 3-bit signed configuration register data value (bit 0)
+    - "cfg_weight_data[1]"                 # ui_in[6]: 3-bit signed configuration register data value (bit 1)
+    - "cfg_weight_data[2]"                 # ui_in[7]: 3-bit signed configuration register data value (bit 2)
 
-  # Outputs
-  uo[0]: ""
-  uo[1]: ""
-  uo[2]: ""
-  uo[3]: ""
-  uo[4]: ""
-  uo[5]: ""
-  uo[6]: ""
-  uo[7]: ""
+  # Dedicated output pins (uo_out)
+  uo:
+    - "output_spike_valid"                 # uo_out[0]: Fired active-high pulse tracking a threshold violation
+    - "output_neuron_id[0]"                # uo_out[1]: 3-bit firing post-synaptic neuron identifier (bit 0)
+    - "output_neuron_id[1]"                # uo_out[2]: 3-bit firing post-synaptic neuron identifier (bit 1)
+    - "output_neuron_id[2]"                # uo_out[3]: 3-bit firing post-synaptic neuron identifier (bit 2)
+    - "Ground"                             # uo_out[4]: Unused driven low (0)
+    - "Ground"                             # uo_out[5]: Unused driven low (0)
+    - "Ground"                             # uo_out[6]: Unused driven low (0)
+    - "Ground"                             # uo_out[7]: Unused driven low (0)
 
-  # Bidirectional pins
-  uio[0]: ""
-  uio[1]: ""
-  uio[2]: ""
-  uio[3]: ""
-  uio[4]: ""
-  uio[5]: ""
-  uio[6]: ""
-  uio[7]: ""
+  # Bidirectional pins configured strictly as inputs (uio_in)
+  uio:
+    - "cfg_target_pre[0]"                  # uio_in[0]: 3-bit configuration row index (bit 0)
+    - "cfg_target_pre[1]"                  # uio_in[1]: 3-bit configuration row index (bit 1)
+    - "cfg_target_pre[2]"                  # uio_in[2]: 3-bit configuration row index (bit 2)
+    - "cfg_target_post[0]"                 # uio_in[3]: 3-bit configuration column index (bit 0)
+    - "cfg_target_post[1]"                 # uio_in[4]: 3-bit configuration column index (bit 1)
+    - "cfg_target_post[2]"                 # uio_in[5]: 3-bit configuration column index (bit 2)
+    - "Unused"                             # uio_in[6]: Unused input
+    - "Unused"                             # uio_in[7]: Unused input
 
-# Do not change!
-yaml_version: 6
+# Summary fields required for the online Tiny Tapeout hardware catalog display page
+documentation:
+  external_hw:  "None (Self-contained internal network logic)"
+  doc_link:     "https://github.com"
+  youtube_link: ""
+  inputs:       "Driven by upstream logic or standard tactile buttons passing 3-bit neuron tracking channels alongside validity flags."
+  outputs:      "Direct single-cycle high logic pulse indicating an internal threshold event alongside the 3-bit post-synaptic binary address index."
+  bidirectional:"Configured strictly as input selectors defining the exact 2D coordinate vector grid cell targeting runtime synaptic weights configurations updates."
+  how_it_works: "The hardware functions as an automated event-driven leaky integrate-and-fire network layer. An incoming signal forces an internal 3-cycle state machine to step sequentially through the 8 post-synaptic target array entries. It indexes the corresponding 3-bit signed registers, updates the 6-bit internal potential registers, accounts for systemic leak vectors, and fires an output indicator pulse if it breaks a fixed internal barrier (+15)."
+  how_to_test:  "Apply hardware reset. Assert ui_in[4] while setting configuration weights data on ui_in[7:5] targeting addresses defined across uio_in to load parameters. Afterward, strobe input_spike_valid alongside a target input channel and track uo_out pins sequentially for a corresponding output spike."
