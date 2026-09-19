@@ -1,6 +1,3 @@
-# Tiny Tapeout Project Information Manifest
-# Fully validated layout formatting for direct HDL flow integration
-
 project:
   title:        "Spiking Neural Processor"
   description:  "An 8x8 event driven neuromorphic processor utilizing 64 3bit signed weights."
@@ -12,43 +9,41 @@ project:
   source_files:
     - "tt_um_neural_processor.v"
 
-# Pinout configuration mapping (Must be exactly 8 items per block, leave blank strings "" for unused slots)
 pinout:
   ui:
     - "input_spike_valid"
-    - "input_neuron_id[0]"
-    - "input_neuron_id[1]"
-    - "input_neuron_id[2]"
+    - "input_neuron_id"
+    - "input_neuron_id"
+    - "input_neuron_id"
     - "cfg_write_en"
-    - "cfg_weight_data[0]"
-    - "cfg_weight_data[1]"
-    - "cfg_weight_data[2]"
+    - "cfg_weight_data"
+    - "cfg_weight_data"
+    - "cfg_weight_data"
   uo:
     - "output_spike_valid"
-    - "output_neuron_id[0]"
-    - "output_neuron_id[1]"
-    - "output_neuron_id[2]"
+    - "output_neuron_id"
+    - "output_neuron_id"
+    - "output_neuron_id"
     - ""
     - ""
     - ""
     - ""
   uio:
-    - "cfg_target_pre[0]"
-    - "cfg_target_pre[1]"
-    - "cfg_target_pre[2]"
-    - "cfg_target_post[0]"
-    - "cfg_target_post[1]"
-    - "cfg_target_post[2]"
+    - "cfg_target_pre"
+    - "cfg_target_pre"
+    - "cfg_target_pre"
+    - "cfg_target_post"
+    - "cfg_target_post"
+    - "cfg_target_post"
     - ""
     - ""
 
-# Mandatory fields required to compile the documentation datasheet
 documentation:
   external_hw:  "None"
-  discord:      "your_discord_handle"
+  discord:      "your_discord_username"
   doc_link:     "https://github.com"
   inputs:       "Strobe input_spike_valid with a 3-bit pre-synaptic ID, or activate cfg_write_en to flash weight values."
   outputs:      "Pulses output_spike_valid alongside a 3-bit post-synaptic address ID whenever a neuron fires."
   bidirectional:"Configured as input buses mapping the exact matrix coordinates for weight adjustments."
-  how_it_works: "Implements an event-driven leaky integrate-and-fire model layer. Incoming events step an FSM over post-synaptic neurons, adding configured 3-bit weights into 6-bit states, subtracting systemic decay loops, and pulsing high on boundary breaches."
-  how_to_test:  "Apply hardware reset. Assert config lines across uio_in to setup baseline routing weights. Strobe active valid spikes on input vectors and trace the output bitstream sequence fields."
+  how_it_works: "Implements an event-driven leaky integrate-and-fire model layer. Incoming events step an FSM over post-synaptic neurons, adding configured 3-bit weights into 6-bit states."
+  how_to_test:  "Apply hardware reset. Assert config lines across uio_in to setup baseline routing weights. Strobe active valid spikes on input vectors."
