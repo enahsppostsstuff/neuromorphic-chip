@@ -10,33 +10,35 @@ project:
     - "tt_um_neural_processor.v"
 
 pinout:
-  ui:
-    - "input_spike_valid"
-    - "input_neuron_id"
-    - "input_neuron_id"
-    - "input_neuron_id"
-    - "cfg_write_en"
-    - "cfg_weight_data"
-    - "cfg_weight_data"
-    - "cfg_weight_data"
-  uo:
-    - "output_spike_valid"
-    - "output_neuron_id"
-    - "output_neuron_id"
-    - "output_neuron_id"
-    - "unused"
-    - "unused"
-    - "unused"
-    - "unused"
-  uio:
-    - "cfg_target_pre"
-    - "cfg_target_pre"
-    - "cfg_target_pre"
-    - "cfg_target_post"
-    - "cfg_target_post"
-    - "cfg_target_post"
-    - "unused"
-    - "unused"
+  # Dedicated input pins (ui_in)
+  ui[0]: "input_spike_valid"
+  ui[1]: "input_neuron_id"
+  ui[2]: "input_neuron_id"
+  ui[3]: "input_neuron_id"
+  ui[4]: "cfg_write_en"
+  ui[5]: "cfg_weight_data"
+  ui[6]: "cfg_weight_data"
+  ui[7]: "cfg_weight_data"
+
+  # Dedicated output pins (uo_out)
+  uo[0]: "output_spike_valid"
+  uo[1]: "output_neuron_id"
+  uo[2]: "output_neuron_id"
+  uo[3]: "output_neuron_id"
+  uo[4]: "unused"
+  uo[5]: "unused"
+  uo[6]: "unused"
+  uo[7]: "unused"
+
+  # Bidirectional pins (uio_in/out)
+  uio[0]: "cfg_target_pre"
+  uio[1]: "cfg_target_pre"
+  uio[2]: "cfg_target_pre"
+  uio[3]: "cfg_target_post"
+  uio[4]: "cfg_target_post"
+  uio[5]: "cfg_target_post"
+  uio[6]: "unused"
+  uio[7]: "unused"
 
 documentation:
   external_hw:  "None"
@@ -47,3 +49,6 @@ documentation:
   bidirectional: "Configured as input buses mapping matrix coordinates for adjustments."
   how_it_works: "Implements event-driven leaky integrate-and-fire model layers tracking 64 weights and 8 states."
   how_to_test:  "Apply hardware reset, assert config lines, and strobe active valid spikes on input vectors."
+
+# Do not change! Required for template parser checking mechanisms.
+yaml_version: 6
