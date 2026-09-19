@@ -1,65 +1,54 @@
 # Tiny Tapeout Project Information Manifest
-# See https://tinytapeout.com for more information
+# Fully validated layout formatting for direct HDL flow integration
 
 project:
-  title:        "Max-Spec 8x8 Event-Driven Spiking Neural Processor"
-  description:  "An event-driven spiking neural processor maximizing a 1x1 tile with 8 pre-synaptic inputs, 8 LIF neurons, and 64 3-bit signed weights."
+  title:        "Spiking Neural Processor"
+  description:  "An 8x8 event driven neuromorphic processor utilizing 64 3bit signed weights."
   author:       "Your Name"
   language:     "SystemVerilog"
-  clock_hz:     50000000       # Target clock speed: 50 MHz
-
-  # How many tiles do you want your design to use? Maxed out to fit safely within a standard 1x1 configuration footprint.
-  tiles: "1x1"
-
-  # Your top module name must match this field precisely
-  top_module: "tt_um_neural_processor"
-
-  # List your source files inside the /src directory
+  clock_hz:     50000000
+  tiles:        "1x1"
+  top_module:   "tt_um_neural_processor"
   source_files:
     - "tt_um_neural_processor.v"
 
-# Pinout mapping matching the Icarus-verified SystemVerilog top-level wrapper interface configuration
+# Pinout configuration mapping (Must be exactly 8 items per block, leave blank strings "" for unused slots)
 pinout:
-  # Dedicated input pins (ui_in)
   ui:
-    - "input_spike_valid / cfg_write_en"  # ui_in[0]: Shared spike evaluation trigger and configuration write gate
-    - "input_neuron_id[0]"                 # ui_in[1]: 3-bit pre-synaptic input source pointer (bit 0)
-    - "input_neuron_id[1]"                 # ui_in[2]: 3-bit pre-synaptic input source pointer (bit 1)
-    - "input_neuron_id[2]"                 # ui_in[3]: 3-bit pre-synaptic input source pointer (bit 2)
-    - "Unused"                             # ui_in[4]: Unused pin (Tied Low)
-    - "cfg_weight_data[0]"                 # ui_in[5]: 3-bit signed configuration register data value (bit 0)
-    - "cfg_weight_data[1]"                 # ui_in[6]: 3-bit signed configuration register data value (bit 1)
-    - "cfg_weight_data[2]"                 # ui_in[7]: 3-bit signed configuration register data value (bit 2)
-
-  # Dedicated output pins (uo_out)
+    - "input_spike_valid"
+    - "input_neuron_id[0]"
+    - "input_neuron_id[1]"
+    - "input_neuron_id[2]"
+    - "cfg_write_en"
+    - "cfg_weight_data[0]"
+    - "cfg_weight_data[1]"
+    - "cfg_weight_data[2]"
   uo:
-    - "output_spike_valid"                 # uo_out[0]: Fired active-high pulse tracking a threshold violation
-    - "output_neuron_id[0]"                # uo_out[1]: 3-bit firing post-synaptic neuron identifier (bit 0)
-    - "output_neuron_id[1]"                # uo_out[2]: 3-bit firing post-synaptic neuron identifier (bit 1)
-    - "output_neuron_id[2]"                # uo_out[3]: 3-bit firing post-synaptic neuron identifier (bit 2)
-    - "Ground"                             # uo_out[4]: Unused driven low (0)
-    - "Ground"                             # uo_out[5]: Unused driven low (0)
-    - "Ground"                             # uo_out[6]: Unused driven low (0)
-    - "Ground"                             # uo_out[7]: Unused driven low (0)
-
-  # Bidirectional pins configured strictly as inputs (uio_in)
+    - "output_spike_valid"
+    - "output_neuron_id[0]"
+    - "output_neuron_id[1]"
+    - "output_neuron_id[2]"
+    - ""
+    - ""
+    - ""
+    - ""
   uio:
-    - "cfg_target_pre[0]"                  # uio_in[0]: 3-bit configuration row index (bit 0)
-    - "cfg_target_pre[1]"                  # uio_in[1]: 3-bit configuration row index (bit 1)
-    - "cfg_target_pre[2]"                  # uio_in[2]: 3-bit configuration row index (bit 2)
-    - "cfg_target_post[0]"                 # uio_in[3]: 3-bit configuration column index (bit 0)
-    - "cfg_target_post[1]"                 # uio_in[4]: 3-bit configuration column index (bit 1)
-    - "cfg_target_post[2]"                 # uio_in[5]: 3-bit configuration column index (bit 2)
-    - "Unused"                             # uio_in[6]: Unused input
-    - "Unused"                             # uio_in[7]: Unused input
+    - "cfg_target_pre[0]"
+    - "cfg_target_pre[1]"
+    - "cfg_target_pre[2]"
+    - "cfg_target_post[0]"
+    - "cfg_target_post[1]"
+    - "cfg_target_post[2]"
+    - ""
+    - ""
 
-# Summary fields required for the online Tiny Tapeout hardware catalog display page
+# Mandatory fields required to compile the documentation datasheet
 documentation:
-  external_hw:  "None (Self-contained internal network logic)"
+  external_hw:  "None"
+  discord:      "your_discord_handle"
   doc_link:     "https://github.com"
-  youtube_link: ""
-  inputs:       "Driven by upstream logic or standard tactile buttons passing 3-bit neuron tracking channels alongside validity flags."
-  outputs:      "Direct single-cycle high logic pulse indicating an internal threshold event alongside the 3-bit post-synaptic binary address index."
-  bidirectional:"Configured strictly as input selectors defining the exact 2D coordinate vector grid cell targeting runtime synaptic weights configurations updates."
-  how_it_works: "The hardware functions as an automated event-driven leaky integrate-and-fire network layer. An incoming signal forces an internal 3-cycle state machine to step sequentially through the 8 post-synaptic target array entries. It indexes the corresponding 3-bit signed registers, updates the 6-bit internal potential registers, accounts for systemic leak vectors, and fires an output indicator pulse if it breaks a fixed internal barrier (+15)."
-  how_to_test:  "Apply hardware reset. Assert ui_in[4] while setting configuration weights data on ui_in[7:5] targeting addresses defined across uio_in to load parameters. Afterward, strobe input_spike_valid alongside a target input channel and track uo_out pins sequentially for a corresponding output spike."
+  inputs:       "Strobe input_spike_valid with a 3-bit pre-synaptic ID, or activate cfg_write_en to flash weight values."
+  outputs:      "Pulses output_spike_valid alongside a 3-bit post-synaptic address ID whenever a neuron fires."
+  bidirectional:"Configured as input buses mapping the exact matrix coordinates for weight adjustments."
+  how_it_works: "Implements an event-driven leaky integrate-and-fire model layer. Incoming events step an FSM over post-synaptic neurons, adding configured 3-bit weights into 6-bit states, subtracting systemic decay loops, and pulsing high on boundary breaches."
+  how_to_test:  "Apply hardware reset. Assert config lines across uio_in to setup baseline routing weights. Strobe active valid spikes on input vectors and trace the output bitstream sequence fields."
