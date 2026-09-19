@@ -1,20 +1,5 @@
-<!---
-
-This file is used to generate your project datasheet. Please fill in the information below and delete any unused
-sections.
-
-You can also include images in this folder and reference them in the markdown. Each image must be less than
-512 kb in size, and the combined size of all images must be less than 1 MB.
--->
-
 ## How it works
-
-Explain how your project works
+This is an 8x8 event-driven spiking neural processor. It processes input spikes sequentially by stepping an accumulation index through post-synaptic neurons, managing 3-bit weights and 6-bit states with leaky integrate-and-fire decay tracking.
 
 ## How to test
-
-Explain how to use your project
-
-## External hardware
-
-List external hardware used in your project (e.g. PMOD, LED display, etc), if any
+Provide an asynchronous system reset. Use the configuration write lines to clock values into the synaptic registers. Apply input valid pulses accompanied by target source indexes, then trace the dedicated output bitstream pins for firing events.
