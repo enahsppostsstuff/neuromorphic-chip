@@ -17,11 +17,11 @@ async def test_project(dut):
     await ClockCycles(dut.clk, 2)
     dut.rst_n.value = 1
 
-    # A valid spike on neuron 3 should generate a pulse with the valid bit set and
-    # the neuron id encoded in bits [6:1].
+    # Valid spike on neuron 3 -> output should have valid bit set and ID in bits [6:1].
     dut.ui_in.value = (1 << 0) | (3 << 1)
     await ClockCycles(dut.clk, 1)
 
-    assert int(dut.uo_out.value & 1) == 1
-    assert ((int(dut.uo_out.value) >> 1) & 0x3F) == 3
+    out = int(dut.uo_out.value)
+    assert (out & 1) == 1
+    assert ((out >> 1) & 0x3F) == 3
     assert int(dut.uio_oe.value) == 0
