@@ -17,7 +17,8 @@ async def test_project(dut):
     await ClockCycles(dut.clk, 2)
     dut.rst_n.value = 1
 
-    # Valid spike on neuron 3 -> output should have valid bit set and ID in bits [6:1].
+    # Valid pulse at neuron 3 should appear as 0b0000011? no, valid is bit 0: 0b0000011? etc.
+    # Actual output format: bit[0]=valid, bits[6:1]=neuron_id.
     dut.ui_in.value = (1 << 0) | (3 << 1)
     await ClockCycles(dut.clk, 1)
 

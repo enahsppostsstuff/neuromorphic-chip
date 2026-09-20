@@ -13,18 +13,15 @@ module tt_um_neural_processor (
     input  wire       rst_n
 );
     reg [7:0] spike_out;
-    reg [7:0] config_word;
 
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
-            spike_out   <= 8'd0;
-            config_word <= 8'd0;
+            spike_out <= 8'd0;
         end else if (ena) begin
             if (ui_in[7]) begin
-                config_word <= uio_in;
-                spike_out   <= 8'd0;
+                spike_out <= 8'd0;
             end else if (ui_in[0]) begin
-                // ui[6:1] is the 6-bit neuron ID; uo[0] is output valid.
+                // Valid bit is bit 0; neuron ID is bits [6:1].
                 spike_out <= {ui_in[6:1], 1'b1};
             end else begin
                 spike_out <= 8'd0;
