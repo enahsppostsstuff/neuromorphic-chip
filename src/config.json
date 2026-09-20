@@ -4,8 +4,9 @@
         "dir::tt_um_neural_processor.v"
     ],
     "CLOCK_PERIOD": 20.0,
-    "FP_SIZING": "relative",
-    "PL_TARGET_DENSITY": 0.35,
+    "DIE_AREA": "0 0 161.00 111.52",
+    "FP_SIZING": "absolute",
+    "PL_TARGET_DENSITY": 0.40,
     "SYNTH_STRATEGY": "AREA 0",
     "CLOCK_PORT": "clk",
     "RESET_PORT": "rst_n"
