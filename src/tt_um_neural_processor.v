@@ -20,13 +20,12 @@ module tt_um_neural_processor (
             spike_out   <= 8'd0;
             config_word <= 8'd0;
         end else if (ena) begin
-            // Config write path: capture the configuration word but keep the core tiny.
             if (ui_in[7]) begin
                 config_word <= uio_in;
                 spike_out   <= 8'd0;
             end else if (ui_in[0]) begin
-                // ui[6:1] is the 6-bit neuron id and bit 0 is the valid pulse.
-                spike_out <= {1'b1, ui_in[6:1]};
+                // ui[6:1] is the 6-bit neuron ID; uo[0] is output valid.
+                spike_out <= {ui_in[6:1], 1'b1};
             end else begin
                 spike_out <= 8'd0;
             end
