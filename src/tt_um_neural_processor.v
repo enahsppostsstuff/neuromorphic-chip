@@ -11,11 +11,12 @@ module tt_um_neural_processor (
     output logic [7:0] uo_out,   // Dedicated outputs
     input  logic [7:0] uio_in,   // Bidirectional inputs
     output logic [7:0] uio_out,  // Bidirectional outputs
-    input  logic [7:0] uio_oe,   // Bidirectional output enables
+    output logic [7:0] uio_oe,   // <-- FIXED THIS LINE TO BE OUTPUT
     input  logic       ena,      // High when design is active
     input  logic       clk,      // System clock
     input  logic       rst_n     // Active-low asynchronous reset
 );
+
 
     // ----------------------------------------------------------------
     // Maximized Parameters
