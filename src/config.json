@@ -1,0 +1,12 @@
+{
+    "DESIGN_NAME": "tt_um_neural_processor",
+    "VERILOG_FILES": [
+        "dir::tt_um_neural_processor.v"
+    ],
+    "CLOCK_PERIOD": 20.0,
+    "DIE_AREA": "0 0 168.36 225.12",
+    "FP_SIZING": "absolute",
+    "PL_TARGET_DENSITY": 0.55,
+    "CLOCK_PORT": "clk",
+    "RESET_PORT": "rst_n"
+}
