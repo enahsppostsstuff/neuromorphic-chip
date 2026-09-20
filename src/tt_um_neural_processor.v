@@ -2,7 +2,7 @@
 // MAX FIT Tiny Tapeout Event-Driven Neuromorphic Core
 // Target Area: Fits tightly inside a 1x1 Tiny Tapeout Tile (~850 gates)
 // Form Factor: 6 Neurons, 6 Synapses per neuron (36 total synapses)
-// 100% Fixed for OpenROAD Global Placement Density Constraints
+// 100% Safe Array Bounds Checked for Icarus Verilog and OpenROAD
 // ====================================================================
 
 module tt_um_neural_processor (
@@ -116,25 +116,28 @@ module tt_um_neural_processor (
 
                 ST_ACCUMULATE: begin
                     logic signed [STATE_BITS-1:0] next_potential;
-                    next_potential = membrane_potentials[processing_neuron] + $signed(active_weight) - LEAK_DECAY;
+                    
+                    // Fixed: Explicitly bound guard check to prevent out-of-bounds simulator array index crashes
+                    if (processing_neuron < NEURONS) begin
+                        next_potential = membrane_potentials[processing_neuron] + $signed(active_weight) - LEAK_DECAY;
 
-                    if (next_potential >= SPIKE_THRESHOLD) begin
-                        membrane_potentials[processing_neuron] <= RESET_POTENTIAL;
-                        output_spike_valid                     <= 1'b1;
-                        output_neuron_id                       <= processing_neuron;
-                    end else begin
-                        if (next_potential < 6'sd0) begin
-                            membrane_potentials[processing_neuron] <= 6'sd0; 
+                        if (next_potential >= SPIKE_THRESHOLD) begin
+                            membrane_potentials[processing_neuron] <= RESET_POTENTIAL;
+                            output_spike_valid                     <= 1'b1;
+                            output_neuron_id                       <= processing_neuron;
                         end else begin
-                            membrane_potentials[processing_neuron] <= next_potential;
+                            if (next_potential < 6'sd0) begin
+                                membrane_potentials[processing_neuron] <= 6'sd0; 
+                            end else begin
+                                membrane_potentials[processing_neuron] <= next_potential;
+                            end
                         end
                     end
-
                     current_state <= ST_EVALUATE;
                 end
 
                 ST_EVALUATE: begin
-                    if (processing_neuron == (NEURONS - 1)) begin
+                    if (processing_neuron >= (NEURONS - 1)) begin
                         current_state <= ST_IDLE;
                     end else begin
                         processing_neuron <= processing_neuron + 1'b1;
