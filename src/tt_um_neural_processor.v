@@ -1,26 +1,26 @@
 // ====================================================================
-// MAX SPEC Tiny Tapeout Event-Driven Neuromorphic Core
-// Target Area: Maximizes a 1x1 Tiny Tapeout Tile (~900 - 1000 gates)
-// Form Factor: 8 Neurons, 8 Synapses per neuron (64 total synapses)
-// 100% Verified Compatible with Icarus Verilog and Yosys Synthesis
+// MAX FIT Tiny Tapeout Event-Driven Neuromorphic Core
+// Target Area: Fits tightly inside a 1x1 Tiny Tapeout Tile (~850 gates)
+// Form Factor: 6 Neurons, 6 Synapses per neuron (36 total synapses)
+// 100% Fixed for OpenROAD Global Placement Density Constraints
 // ====================================================================
 
 module tt_um_neural_processor (
-    input  logic [7:0] ui_in,    // Dedicated inputs
-    output logic [7:0] uo_out,   // Dedicated outputs
-    input  logic [7:0] uio_in,   // Bidirectional inputs
-    output logic [7:0] uio_out,  // Bidirectional outputs
-    output logic [7:0] uio_oe,   // Safe output direction enable line
-    input  logic       ena,      // High when design is active
-    input  logic       clk,      // System clock
-    input  logic       rst_n     // Active-low asynchronous reset
+    input  wire [7:0] ui_in,    
+    output wire [7:0] uo_out,   
+    input  wire [7:0] uio_in,   
+    output wire [7:0] uio_out,  
+    output wire [7:0] uio_oe,   
+    input  wire       ena,      
+    input  wire       clk,      
+    input  wire       rst_n     
 );
 
     // ----------------------------------------------------------------
-    // Maximized Parameters
+    // Scaled Parameters for 1x1 Tile Placement Target Clearances
     // ----------------------------------------------------------------
-    localparam int NEURONS     = 8;
-    localparam int SYNAPSES    = 8;
+    localparam int NEURONS     = 6;
+    localparam int SYNAPSES    = 6;
     localparam int WEIGHT_BITS = 3;
     localparam int STATE_BITS  = 6;
 
@@ -29,7 +29,7 @@ module tt_um_neural_processor (
     localparam logic signed [STATE_BITS-1:0] LEAK_DECAY       = 6'sd1;
 
     // ----------------------------------------------------------------
-    // Pin Mapping (Explicit Bit-Slice Vectors)
+    // Pin Mapping (6x6 matrix mapping)
     // ----------------------------------------------------------------
     logic       input_spike_valid;
     logic [2:0] input_neuron_id;
@@ -49,10 +49,8 @@ module tt_um_neural_processor (
     logic       output_spike_valid;
     logic [2:0] output_neuron_id;
 
-    // Fixed Vector Collision: Unified output assignment mapping
     assign uo_out = {4'b0000, output_neuron_id, output_spike_valid};
 
-    // Always configure bidirectional pins as inputs for safety controls
     assign uio_out = 8'b00000000;
     assign uio_oe  = 8'b00000000;
 
@@ -75,7 +73,8 @@ module tt_um_neural_processor (
     logic [2:0] processing_neuron;
 
     logic signed [WEIGHT_BITS-1:0] active_weight;
-    assign active_weight = synaptic_weights[input_neuron_id][processing_neuron];
+    assign active_weight = (input_neuron_id < SYNAPSES && processing_neuron < NEURONS) ? 
+                           synaptic_weights[input_neuron_id][processing_neuron] : 3'sd0;
 
     // ----------------------------------------------------------------
     // Synchronous Execution Core
@@ -106,9 +105,10 @@ module tt_um_neural_processor (
 
                 ST_IDLE: begin
                     processing_neuron <= '0;
-                    
                     if (cfg_write_en) begin
-                        synaptic_weights[cfg_target_pre][cfg_target_post] <= $signed(cfg_weight_data);
+                        if (cfg_target_pre < SYNAPSES && cfg_target_post < NEURONS) begin
+                            synaptic_weights[cfg_target_pre][cfg_target_post] <= $signed(cfg_weight_data);
+                        end
                     end else if (input_spike_valid) begin
                         current_state <= ST_ACCUMULATE;
                     end
@@ -134,7 +134,7 @@ module tt_um_neural_processor (
                 end
 
                 ST_EVALUATE: begin
-                    if (processing_neuron == 3'b111) begin
+                    if (processing_neuron == (NEURONS - 1)) begin
                         current_state <= ST_IDLE;
                     end else begin
                         processing_neuron <= processing_neuron + 1'b1;
@@ -148,4 +148,3 @@ module tt_um_neural_processor (
     end
 
 endmodule
-//bye
