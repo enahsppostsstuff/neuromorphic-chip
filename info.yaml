@@ -1,54 +1,59 @@
 project:
-  title:        "Spiking Neural Processor"
-  description:  "An 8x8 event driven neuromorphic processor utilizing 64 3bit signed weights."
+  title:        "64-Neuron Neuromorphic Processor"
+  description:  "A 1x1 event-driven neuromorphic processor with 64 neurons and 256 synapses."
   author:       "Your Name"
-  language:     "SystemVerilog"
+  language:     "Verilog"
   clock_hz:     50000000
   tiles:        "1x1"
+  neurons:      64
+  synapses:     256
+  ram:          "32KB"
+  storage:      "512MB"
+  io:           "8 input, 8 output, 8 bidirectional"
   top_module:   "tt_um_neural_processor"
   source_files:
     - "tt_um_neural_processor.v"
 
 pinout:
-  # Dedicated input pins (ui_in)
+  # ui[0] is spike valid, ui[6:1] is a 6-bit neuron ID, and ui[7] is config write.
   ui[0]: "input_spike_valid"
-  ui[1]: "input_neuron_id"
-  ui[2]: "input_neuron_id"
-  ui[3]: "input_neuron_id"
-  ui[4]: "cfg_write_en"
-  ui[5]: "cfg_weight_data"
-  ui[6]: "cfg_weight_data"
-  ui[7]: "cfg_weight_data"
+  ui[1]: "neuron_id[0]"
+  ui[2]: "neuron_id[1]"
+  ui[3]: "neuron_id[2]"
+  ui[4]: "neuron_id[3]"
+  ui[5]: "neuron_id[4]"
+  ui[6]: "neuron_id[5]"
+  ui[7]: "cfg_write_en"
 
-  # Dedicated output pins (uo_out)
+  # uo[0] is output valid and uo[6:1] is the post-synaptic neuron ID.
   uo[0]: "output_spike_valid"
-  uo[1]: "output_neuron_id"
-  uo[2]: "output_neuron_id"
-  uo[3]: "output_neuron_id"
-  uo[4]: "unused"
-  uo[5]: "unused"
-  uo[6]: "unused"
+  uo[1]: "output_neuron_id[0]"
+  uo[2]: "output_neuron_id[1]"
+  uo[3]: "output_neuron_id[2]"
+  uo[4]: "output_neuron_id[3]"
+  uo[5]: "output_neuron_id[4]"
+  uo[6]: "output_neuron_id[5]"
   uo[7]: "unused"
 
-  # Bidirectional pins (uio_in/out)
-  uio[0]: "cfg_target_pre"
-  uio[1]: "cfg_target_pre"
-  uio[2]: "cfg_target_pre"
-  uio[3]: "cfg_target_post"
-  uio[4]: "cfg_target_post"
-  uio[5]: "cfg_target_post"
-  uio[6]: "unused"
-  uio[7]: "unused"
+  # During configuration, uio[7:2] selects a post-neuron and uio[1:0]
+  # selects one of four synapse slots for the selected pre-neuron.
+  uio[0]: "synapse_slot[0]"
+  uio[1]: "synapse_slot[1]"
+  uio[2]: "post_neuron_id[0]"
+  uio[3]: "post_neuron_id[1]"
+  uio[4]: "post_neuron_id[2]"
+  uio[5]: "post_neuron_id[3]"
+  uio[6]: "post_neuron_id[4]"
+  uio[7]: "post_neuron_id[5]"
 
 documentation:
   external_hw:  "None"
   discord:      "your_discord_username"
   doc_link:     "https://github.com"
-  inputs:       "Strobe input_spike_valid with 3bit pre-synaptic ID, or activate cfg_write_en to flash weights."
-  outputs:      "Pulses output_spike_valid alongside 3bit post-synaptic address ID whenever a neuron fires."
-  bidirectional: "Configured as input buses mapping matrix coordinates for adjustments."
-  how_it_works: "Implements event-driven leaky integrate-and-fire model layers tracking 64 weights and 8 states."
-  how_to_test:  "Apply hardware reset, assert config lines, and strobe active valid spikes on input vectors."
+  inputs:       "Configure a synapse with cfg_write_en, a 6-bit pre-neuron ID, a 6-bit post-neuron ID, and one of four slots; then strobe input_spike_valid."
+  outputs:      "Pulses output_spike_valid alongside the 6-bit post-synaptic neuron ID when the leaky integrate-and-fire threshold is reached."
+  bidirectional: "Configuration input bus; all bidirectional pins remain input-only in normal operation."
+  how_it_works: "A 1x1 tile implements 64 neurons, four configurable synapses per neuron (256 total), 32KB on-chip RAM, and a documented 512MB external storage capacity."
+  how_to_test:  "Reset the design, configure a synapse, and strobe a valid spike for its pre-synaptic neuron."
 
-# Do not change! Required for template parser checking mechanisms.
 yaml_version: 6
